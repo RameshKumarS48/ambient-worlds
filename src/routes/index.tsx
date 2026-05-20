@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { QUESTIONS } from "@/lib/questions";
 import { recommend, type Answers, type Title, PLATFORM_LABEL } from "@/lib/catalog";
 import { PosterFallback } from "@/components/PosterFallback";
@@ -256,5 +256,3 @@ function ResultCard({ t, rank }: { t: Title; rank: number }) {
   );
 }
 
-// touch unused imports
-void useEffect; void useMemo;
