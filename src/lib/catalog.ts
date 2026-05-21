@@ -195,19 +195,21 @@ export function recommend(answers: Answers): Title[] {
   // When a specific language is chosen, restrict pool to that language so wrong-language
   // titles never crowd out the user's preference. Fall back to full catalog only if the
   // language pool is too small to fill 5 results.
-  const langPool = answers.language !== "any"
+  const wantSpecificLang = answers.language !== "any";
+  const langPool = wantSpecificLang
     ? CATALOG.filter((t) => t.language === answers.language)
     : CATALOG;
-  const pool = langPool.length >= 5 ? langPool : CATALOG;
+  const usingLangFilter = wantSpecificLang && langPool.length >= 5;
+  const pool = usingLangFilter ? langPool : CATALOG;
 
   const scored = pool.map((t) => {
     let s = 0;
 
-    // Language (only scored when falling back to full catalog)
-    if (pool === CATALOG) {
+    // Language scoring only applies when we fell back to the full catalog
+    if (!usingLangFilter) {
       if (answers.language === "any") s += 1;
-      else if (t.language === answers.language) s += 5;
-      else s -= 3;
+      else if (t.language === answers.language) s += 8;
+      else s -= 8;
     }
 
     // Format
