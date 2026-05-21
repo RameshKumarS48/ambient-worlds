@@ -19,14 +19,21 @@ vi.mock("@/lib/watchmode", () => ({
   fetchStreamingAvailability: vi.fn().mockResolvedValue({}),
 }));
 
+vi.mock("@/lib/snark", () => ({
+  getSarcasticLine: vi.fn().mockReturnValue("test snark"),
+  getMoodSummary: vi.fn().mockReturnValue(["line 1", "line 2", "line 3"]),
+}));
+
 import { App } from "../index";
+
+const STEP_WAIT = { timeout: 2000 };
+const FINAL_WAIT = { timeout: 4000 };
 
 describe("App quiz flow", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("renders the landing phase by default", () => {
     render(<App />);
-    // Heading is split across elements — match a fragment that exists in one node
     expect(screen.getByText(/watch tonight/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /let's go/i })).toBeInTheDocument();
   });
@@ -52,19 +59,19 @@ describe("App quiz flow", () => {
     render(<App />);
     await user.click(screen.getByRole("button", { name: /let's go/i }));
     await user.click(screen.getByRole("button", { name: /Happy & Upbeat/i }));
-    await waitFor(() => expect(screen.getByText("2 / 8")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("2 / 8")).toBeInTheDocument(), STEP_WAIT);
     expect(screen.getByText(/What genre are you feeling\?/i)).toBeInTheDocument();
-  });
+  }, 5000);
 
   it("back button returns to the previous question", async () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole("button", { name: /let's go/i }));
     await user.click(screen.getByRole("button", { name: /Happy & Upbeat/i }));
-    await waitFor(() => screen.getByText("2 / 8"));
+    await waitFor(() => screen.getByText("2 / 8"), STEP_WAIT);
     await user.click(screen.getByRole("button", { name: /← back/i }));
     expect(screen.getByText("1 / 8")).toBeInTheDocument();
-  });
+  }, 5000);
 
   it("shows loading phase after answering all 8 questions", async () => {
     const user = userEvent.setup();
@@ -78,13 +85,14 @@ describe("App quiz flow", () => {
       );
       expect(answerBtn).toBeDefined();
       await user.click(answerBtn!);
-      if (i < 7) await waitFor(() => screen.getByText(`${i + 2} / 8`));
+      if (i < 7) await waitFor(() => screen.getByText(`${i + 2} / 8`), STEP_WAIT);
     }
 
-    await waitFor(() =>
-      expect(screen.getByText(/Finding your picks/i)).toBeInTheDocument(),
+    await waitFor(
+      () => expect(screen.getByText(/Finding your picks/i)).toBeInTheDocument(),
+      FINAL_WAIT,
     );
-  });
+  }, 20000);
 
   it("Start over button resets to landing", async () => {
     const user = userEvent.setup();
@@ -97,12 +105,11 @@ describe("App quiz flow", () => {
         (b) => !b.textContent?.includes("Back") && !b.textContent?.match(/let.s go/i),
       );
       await user.click(answerBtn!);
-      if (i < 7) await waitFor(() => screen.getByText(`${i + 2} / 8`));
+      if (i < 7) await waitFor(() => screen.getByText(`${i + 2} / 8`), STEP_WAIT);
     }
 
-    await waitFor(() => screen.getByText(/Start over/i), { timeout: 5000 });
+    await waitFor(() => screen.getByText(/Start over/i), FINAL_WAIT);
     await user.click(screen.getByRole("button", { name: /start over/i }));
-
     expect(screen.getByText(/watch tonight/i)).toBeInTheDocument();
-  });
+  }, 20000);
 });

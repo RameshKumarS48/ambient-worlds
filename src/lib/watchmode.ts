@@ -21,6 +21,7 @@ async function getWatchmodeId(apiKey: string, title: string, year: number, forma
   const type = format === "movie" ? "movie" : "tv_series";
   const url = `https://api.watchmode.com/v1/search/?apiKey=${apiKey}&search_field=name&search_value=${encodeURIComponent(title)}&types=${type}`;
   const res = await fetch(url);
+  // On quota exceeded (429) or any error, fall through to catalog fallback silently
   if (!res.ok) return null;
   const data = await res.json() as { title_results: SearchResult[] };
   const results = data.title_results ?? [];

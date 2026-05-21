@@ -5,6 +5,7 @@ import { recommend, type Answers, type Title, PLATFORM_LABEL } from "@/lib/catal
 import { PosterFallback } from "@/components/PosterFallback";
 import { enrichWithPosters } from "@/lib/wikipedia";
 import { fetchStreamingAvailability } from "@/lib/watchmode";
+import { getSarcasticLine, getMoodSummary } from "@/lib/snark";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,15 +26,22 @@ export function App() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<Answers>>({});
   const [results, setResults] = useState<Title[]>([]);
+  const [snark, setSnark] = useState<string | null>(null);
+  const [moodSummary, setMoodSummary] = useState<string[]>([]);
   const [, startTransition] = useTransition();
 
-  const start = () => { setAnswers({}); setStep(0); setPhase("quiz"); };
+  const start = () => { setAnswers({}); setStep(0); setSnark(null); setMoodSummary([]); setPhase("quiz"); };
 
   const handlePick = (key: keyof Answers, value: string) => {
     const next = { ...answers, [key]: value };
     setAnswers(next);
+    const isFinal = step + 1 >= QUESTIONS.length;
+    setSnark(getSarcasticLine(key, value));
+    if (isFinal) setMoodSummary(getMoodSummary(next as Answers));
     setTimeout(() => {
-      if (step + 1 < QUESTIONS.length) {
+      setSnark(null);
+      setMoodSummary([]);
+      if (!isFinal) {
         setStep(step + 1);
       } else {
         setPhase("loading");
@@ -52,16 +60,16 @@ export function App() {
           setPhase("results");
         });
       }
-    }, 300);
+    }, isFinal ? 2500 : 1400);
   };
 
-  const back = () => { if (step > 0) setStep(step - 1); };
-  const reset = () => { setPhase("landing"); setStep(0); setAnswers({}); setResults([]); };
+  const back = () => { if (step > 0) { setSnark(null); setMoodSummary([]); setStep(step - 1); } };
+  const reset = () => { setPhase("landing"); setStep(0); setAnswers({}); setResults([]); setSnark(null); setMoodSummary([]); };
 
   return (
     <main className="min-h-screen bg-background text-foreground">
       {phase === "landing" && <Landing onStart={start} />}
-      {phase === "quiz" && <Quiz step={step} answers={answers} onPick={handlePick} onBack={back} />}
+      {phase === "quiz" && <Quiz step={step} answers={answers} onPick={handlePick} onBack={back} snark={snark} moodSummary={moodSummary} />}
       {phase === "loading" && <Loading />}
       {phase === "results" && <Results results={results} onReset={reset} />}
     </main>
@@ -112,12 +120,14 @@ function Landing({ onStart }: { onStart: () => void }) {
 }
 
 function Quiz({
-  step, answers, onPick, onBack,
+  step, answers, onPick, onBack, snark, moodSummary,
 }: {
   step: number;
   answers: Partial<Answers>;
   onPick: (key: keyof Answers, value: string) => void;
   onBack: () => void;
+  snark: string | null;
+  moodSummary: string[];
 }) {
   const q = QUESTIONS[step];
   const progress = (step / QUESTIONS.length) * 100;
@@ -187,6 +197,35 @@ function Quiz({
               );
             })}
           </div>
+
+          {/* Sarcastic comment */}
+          {snark && (
+            <div className="mt-6 animate-q-in">
+              <p
+                className="text-sm italic text-muted-foreground"
+                style={{ fontFamily: "'Overpass Mono', monospace" }}
+              >
+                {snark}
+              </p>
+
+              {/* Mood summary — final question only */}
+              {moodSummary.length > 0 && (
+                <div className="mt-5 rounded-xl border border-border bg-muted/60 p-4 animate-q-in">
+                  <p
+                    className="mb-2 text-[10px] font-bold uppercase tracking-widest"
+                    style={{ fontFamily: "'Overpass Mono', monospace", color: "#c800df" }}
+                  >
+                    Tonight's vibe
+                  </p>
+                  {moodSummary.map((line, i) => (
+                    <p key={i} className="text-sm text-foreground leading-relaxed">
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
