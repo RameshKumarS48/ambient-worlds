@@ -15,8 +15,9 @@ export type Title = {
   audience: string[]; // solo, partner, family, friends
   why: string;
   color: string; // gradient color for fallback
-  posterPath?: string | null; // TMDB poster path
-  tmdbId?: number; // TMDB movie/show ID
+  posterPath?: string | null;
+  tmdbId?: number;
+  streamingPlatforms?: string[]; // live data from Watchmode
 };
 
 export function yearToEra(year: number): Title["era"] {

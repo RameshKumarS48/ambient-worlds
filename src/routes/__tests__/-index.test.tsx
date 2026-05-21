@@ -15,6 +15,10 @@ vi.mock("@/lib/wikipedia", () => ({
   ),
 }));
 
+vi.mock("@/lib/watchmode", () => ({
+  fetchStreamingAvailability: vi.fn().mockResolvedValue({}),
+}));
+
 import { App } from "../index";
 
 describe("App quiz flow", () => {

@@ -4,6 +4,7 @@ import { QUESTIONS } from "@/lib/questions";
 import { recommend, type Answers, type Title, PLATFORM_LABEL } from "@/lib/catalog";
 import { PosterFallback } from "@/components/PosterFallback";
 import { enrichWithPosters } from "@/lib/wikipedia";
+import { fetchStreamingAvailability } from "@/lib/watchmode";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,8 +39,16 @@ export function App() {
         setPhase("loading");
         startTransition(async () => {
           const top5 = recommend(next as Answers);
-          const enriched = await enrichWithPosters(top5);
-          setResults(enriched);
+          const [enriched, streamingMap] = await Promise.all([
+            enrichWithPosters(top5),
+            fetchStreamingAvailability({
+              data: top5.map((t) => ({ id: t.id, title: t.title, year: t.year, format: t.format })),
+            }).catch(() => ({} as Record<string, string[]>)),
+          ]);
+          const withStreaming = enriched.map((t) =>
+            streamingMap[t.id]?.length ? { ...t, streamingPlatforms: streamingMap[t.id] } : t,
+          );
+          setResults(withStreaming);
           setPhase("results");
         });
       }
@@ -299,12 +308,18 @@ function HeroCard({ t, rank }: { t: Title; rank: number }) {
                 {g}
               </span>
             ))}
-            <span
-              className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white"
-              style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
-            >
-              {PLATFORM_LABEL[t.platforms[0]] ?? "Available"}
-            </span>
+            {(t.streamingPlatforms?.length
+              ? t.streamingPlatforms.slice(0, 2)
+              : [PLATFORM_LABEL[t.platforms[0]] ?? "Available"]
+            ).map((p) => (
+              <span
+                key={p}
+                className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white"
+                style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
+              >
+                {p}
+              </span>
+            ))}
           </div>
 
           <p className="mt-3 line-clamp-3 text-sm font-light text-muted-foreground">
@@ -363,17 +378,33 @@ function ResultCard({ t, rank }: { t: Title; rank: number }) {
 
         <p className="mt-2 line-clamp-2 text-xs font-light text-muted-foreground">{t.why}</p>
 
-        <div className="mt-auto flex items-center justify-between pt-3">
-          <span className="text-xs font-bold tabular-nums text-muted-foreground">★ {t.rating.toFixed(1)}</span>
-          <a
-            href={watchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-bold transition-opacity hover:opacity-70"
-            style={{ color: "#c800df" }}
-          >
-            Watch →
-          </a>
+        <div className="mt-auto pt-3">
+          <div className="flex flex-wrap gap-1 mb-2">
+            {(t.streamingPlatforms?.length
+              ? t.streamingPlatforms.slice(0, 1)
+              : [PLATFORM_LABEL[t.platforms[0]] ?? "Available"]
+            ).map((p) => (
+              <span
+                key={p}
+                className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
+                style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
+              >
+                {p}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold tabular-nums text-muted-foreground">★ {t.rating.toFixed(1)}</span>
+            <a
+              href={watchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold transition-opacity hover:opacity-70"
+              style={{ color: "#c800df" }}
+            >
+              Watch →
+            </a>
+          </div>
         </div>
       </div>
     </article>
