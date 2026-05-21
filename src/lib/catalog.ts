@@ -15,6 +15,39 @@ export type Title = {
   audience: string[]; // solo, partner, family, friends
   why: string;
   color: string; // gradient color for fallback
+  posterPath?: string | null; // TMDB poster path
+  tmdbId?: number; // TMDB movie/show ID
+};
+
+export function yearToEra(year: number): Title["era"] {
+  if (year < 2000) return "classic";
+  if (year < 2010) return "2000s";
+  if (year < 2020) return "2010s";
+  return "recent";
+}
+
+export const GENRE_ID_TO_NAME: Record<number, string> = {
+  28: "action",
+  12: "adventure",
+  16: "animation",
+  35: "comedy",
+  80: "crime",
+  18: "drama",
+  10751: "family",
+  14: "fantasy",
+  27: "horror",
+  9648: "mystery",
+  10749: "romance",
+  878: "sci-fi",
+  53: "thriller",
+  10759: "action",
+  10765: "sci-fi",
+  10762: "family",
+  10763: "drama",
+  10766: "drama",
+  10767: "comedy",
+  10768: "drama",
+  37: "drama",
 };
 
 export const CATALOG: Title[] = [
