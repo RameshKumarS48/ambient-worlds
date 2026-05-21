@@ -67,7 +67,7 @@ export function App() {
   const reset = () => { setPhase("landing"); setStep(0); setAnswers({}); setResults([]); setSnark(null); setMoodSummary([]); };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen bg-background text-foreground" data-build="2">
       {phase === "landing" && <Landing onStart={start} />}
       {phase === "quiz" && <Quiz step={step} answers={answers} onPick={handlePick} onBack={back} snark={snark} moodSummary={moodSummary} />}
       {phase === "loading" && <Loading />}

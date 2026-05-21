@@ -73,7 +73,10 @@ export default {
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
-      console.error(error);
+      const msg = error instanceof Error
+        ? `${error.name}: ${error.message}\n${error.stack ?? ""}`
+        : String(error);
+      console.error("[worker-crash]", msg);
       return brandedErrorResponse();
     }
   },

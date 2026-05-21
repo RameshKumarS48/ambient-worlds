@@ -47,7 +47,7 @@ async function getStreamingSources(apiKey: string, watchmodeId: number): Promise
 }
 
 export const fetchStreamingAvailability = createServerFn({ method: "POST" })
-  .validator((data: TitleInput[]) => data)
+  .inputValidator((data: TitleInput[]) => data)
   .handler(async ({ data }) => {
     const apiKey = process.env.WATCHMODE_API_KEY;
     if (!apiKey) return {} as Record<string, string[]>;
