@@ -26,11 +26,7 @@ export function App() {
   const [results, setResults] = useState<Title[]>([]);
   const [, startTransition] = useTransition();
 
-  const start = () => {
-    setAnswers({});
-    setStep(0);
-    setPhase("quiz");
-  };
+  const start = () => { setAnswers({}); setStep(0); setPhase("quiz"); };
 
   const handlePick = (key: keyof Answers, value: string) => {
     const next = { ...answers, [key]: value };
@@ -41,8 +37,7 @@ export function App() {
       } else {
         setPhase("loading");
         startTransition(async () => {
-          const finalAnswers = next as Answers;
-          const top5 = recommend(finalAnswers);
+          const top5 = recommend(next as Answers);
           const enriched = await enrichWithPosters(top5);
           setResults(enriched);
           setPhase("results");
@@ -51,23 +46,13 @@ export function App() {
     }, 300);
   };
 
-  const back = () => {
-    if (step > 0) setStep(step - 1);
-  };
-
-  const reset = () => {
-    setPhase("landing");
-    setStep(0);
-    setAnswers({});
-    setResults([]);
-  };
+  const back = () => { if (step > 0) setStep(step - 1); };
+  const reset = () => { setPhase("landing"); setStep(0); setAnswers({}); setResults([]); };
 
   return (
     <main className="min-h-screen bg-background text-foreground">
       {phase === "landing" && <Landing onStart={start} />}
-      {phase === "quiz" && (
-        <Quiz step={step} answers={answers} onPick={handlePick} onBack={back} />
-      )}
+      {phase === "quiz" && <Quiz step={step} answers={answers} onPick={handlePick} onBack={back} />}
       {phase === "loading" && <Loading />}
       {phase === "results" && <Results results={results} onReset={reset} />}
     </main>
@@ -77,61 +62,48 @@ export function App() {
 function Landing({ onStart }: { onStart: () => void }) {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center">
-      {/* Crimson radial glow */}
+      {/* Ambient blobs */}
       <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 50% 60%, rgba(139,26,26,0.18) 0%, transparent 70%)",
-        }}
+        className="animate-blob pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-20"
+        style={{ background: "radial-gradient(circle, #c800df, transparent 70%)" }}
+      />
+      <div
+        className="animate-blob pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full opacity-15"
+        style={{ background: "radial-gradient(circle, #e60076, transparent 70%)", animationDelay: "3s" }}
       />
 
-      {/* Decorative top border */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-40" />
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent opacity-20" />
-
       <div className="relative max-w-2xl animate-q-in">
-        <p
-          className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] text-gold opacity-80"
-          style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+        <span
+          className="mb-4 inline-block rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+          style={{ fontFamily: "'Overpass Mono', monospace" }}
         >
-          Tonight's Screening
-        </p>
-        <h1
-          className="text-balance text-5xl font-bold leading-[1.1] tracking-wide text-gold-shimmer sm:text-6xl md:text-7xl"
-          style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-        >
-          What Should I Watch Tonight?
+          Tonight's Pick
+        </span>
+
+        <h1 className="text-balance text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+          What should I{" "}
+          <span className="text-gradient animate-gradient-x">watch tonight?</span>
         </h1>
-        <p className="mt-6 text-balance text-lg italic text-foreground/60 sm:text-xl">
-          Answer 8 questions. Receive your perfect screening.
+
+        <p className="mt-5 text-balance text-lg font-light text-muted-foreground sm:text-xl">
+          Answer 8 questions. Get 5 perfect picks.
         </p>
+
         <button
           onClick={onStart}
-          className="group mt-10 inline-flex items-center gap-3 border border-gold/50 px-8 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-gold transition-all duration-300 hover:border-gold hover:bg-gold/10 hover:shadow-[0_0_30px_rgba(201,168,76,0.15)] active:scale-[0.98]"
-          style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+          className="group mt-10 inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-200 hover:scale-[1.03] hover:shadow-xl active:scale-[0.98]"
+          style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
         >
-          Begin
-          <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
-            →
-          </span>
+          Let's go
+          <span className="transition-transform duration-200 group-hover:translate-x-1" aria-hidden>→</span>
         </button>
       </div>
-
-      {/* Corner ornaments */}
-      <div className="pointer-events-none absolute left-6 top-6 h-8 w-8 border-l border-t border-gold/20" />
-      <div className="pointer-events-none absolute right-6 top-6 h-8 w-8 border-r border-t border-gold/20" />
-      <div className="pointer-events-none absolute bottom-6 left-6 h-8 w-8 border-b border-l border-gold/20" />
-      <div className="pointer-events-none absolute bottom-6 right-6 h-8 w-8 border-b border-r border-gold/20" />
     </section>
   );
 }
 
 function Quiz({
-  step,
-  answers,
-  onPick,
-  onBack,
+  step, answers, onPick, onBack,
 }: {
   step: number;
   answers: Partial<Answers>;
@@ -145,27 +117,26 @@ function Quiz({
   return (
     <section className="min-h-screen">
       {/* Progress bar */}
-      <div className="fixed inset-x-0 top-0 z-10 h-[2px] bg-border">
+      <div className="fixed inset-x-0 top-0 z-10 h-1 bg-muted">
         <div
-          className="progress-cinematic h-full transition-[width] duration-500 ease-out"
+          className="progress-contemporary h-full transition-[width] duration-500 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 pb-16 pt-12">
+      <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-6 pb-16 pt-12">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
             onClick={onBack}
             disabled={step === 0}
-            className="text-sm tracking-wider text-muted-foreground transition-opacity hover:text-gold disabled:pointer-events-none disabled:opacity-0"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-0"
           >
             ← Back
           </button>
           <span
-            className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground tabular-nums"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+            className="text-xs font-medium tabular-nums text-muted-foreground"
+            style={{ fontFamily: "'Overpass Mono', monospace" }}
           >
             {step + 1} / {QUESTIONS.length}
           </span>
@@ -173,22 +144,18 @@ function Quiz({
 
         {/* Question */}
         <div key={step} className="flex flex-1 flex-col justify-center animate-q-in">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-crimson opacity-70"
-             style={{ fontFamily: "'Cinzel', Georgia, serif" }}>
+          <p
+            className="mb-3 text-xs font-semibold uppercase tracking-widest"
+            style={{ fontFamily: "'Overpass Mono', monospace", color: "#c800df" }}
+          >
             Question {step + 1}
           </p>
-          <h2
-            className="text-balance text-3xl font-bold leading-tight tracking-wide text-foreground sm:text-4xl md:text-5xl"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-          >
+          <h2 className="text-balance text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">
             {q.title}
           </h2>
-          <p className="mt-3 text-base italic text-muted-foreground sm:text-lg">
-            {q.subtitle}
-          </p>
+          <p className="mt-2 text-base font-light text-muted-foreground">{q.subtitle}</p>
 
-          {/* Options */}
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {q.options.map((opt, i) => {
               const active = selected === opt.value;
               return (
@@ -197,11 +164,14 @@ function Quiz({
                   onClick={() => onPick(q.key, opt.value)}
                   style={{ animationDelay: `${i * 0.04}s` }}
                   className={[
-                    "animate-q-in rounded-none border px-5 py-3 text-base transition-all duration-200",
+                    "animate-q-in rounded-xl border px-5 py-3 text-sm font-semibold transition-all duration-150",
                     active
-                      ? "border-gold bg-gold text-primary-foreground shadow-[0_0_20px_rgba(201,168,76,0.25)]"
-                      : "border-border bg-card text-foreground hover:border-gold/60 hover:bg-gold/5 hover:text-gold",
+                      ? "border-transparent text-white shadow-md"
+                      : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-muted",
                   ].join(" ")}
+                  {...(active
+                    ? { style: { animationDelay: `${i * 0.04}s`, background: "linear-gradient(135deg, #c800df, #e60076)", border: "transparent" } }
+                    : { style: { animationDelay: `${i * 0.04}s` } })}
                 >
                   {opt.label}
                 </button>
@@ -216,210 +186,193 @@ function Quiz({
 
 function Loading() {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
-      {/* Projector beam */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-0 h-[70vh] w-48 origin-top"
-        style={{
-          background: "linear-gradient(180deg, rgba(201,168,76,0.12) 0%, transparent 100%)",
-          animation: "beam-sweep 3s ease-in-out infinite",
-          clipPath: "polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%)",
-        }}
-      />
-
-      {/* Film strip */}
-      <div className="mb-12 flex overflow-hidden" style={{ maxWidth: "320px" }}>
-        <div className="animate-film flex gap-1.5 shrink-0">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex h-20 w-14 shrink-0 flex-col justify-between rounded-sm border border-border bg-card p-1"
-            >
-              <div className="flex gap-0.5">
-                {[0, 1, 2].map((j) => (
-                  <div key={j} className="h-1.5 w-2 rounded-[1px] bg-muted" />
-                ))}
-              </div>
-              <div className="mx-1 flex-1 rounded-[1px] bg-muted/30" />
-              <div className="flex gap-0.5">
-                {[0, 1, 2].map((j) => (
-                  <div key={j} className="h-1.5 w-2 rounded-[1px] bg-muted" />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+    <section className="flex min-h-screen flex-col items-center justify-center gap-6 px-6">
+      {/* Spinning ring */}
+      <div className="relative h-14 w-14">
+        <div className="absolute inset-0 rounded-full border-4 border-muted" />
+        <div
+          className="animate-spin-ring absolute inset-0 rounded-full border-4 border-transparent"
+          style={{ borderTopColor: "#c800df" }}
+        />
       </div>
-
-      <p
-        className="text-xl font-semibold uppercase tracking-[0.3em] text-gold"
-        style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-      >
-        Curating your screening…
-      </p>
-      <div className="mt-5 flex items-center gap-2">
-        <span className="h-2 w-2 rounded-full bg-gold animate-soft-pulse" />
-        <span className="h-2 w-2 rounded-full bg-gold animate-soft-pulse" style={{ animationDelay: "0.2s" }} />
-        <span className="h-2 w-2 rounded-full bg-gold animate-soft-pulse" style={{ animationDelay: "0.4s" }} />
+      <div className="text-center">
+        <p className="text-lg font-bold text-foreground">Finding your picks…</p>
+        <p className="mt-1 text-sm font-light text-muted-foreground">Matching your vibe to the perfect watch</p>
       </div>
     </section>
   );
 }
 
 function Results({ results, onReset }: { results: Title[]; onReset: () => void }) {
+  const [hero, ...rest] = results;
+
   return (
-    <section className="mx-auto max-w-6xl px-6 py-14 animate-q-in">
-      {/* Decorative top rule */}
-      <div className="mb-10 flex items-center gap-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-border" />
-        <header className="text-center">
-          <p
-            className="mb-2 text-xs font-semibold uppercase tracking-[0.35em] text-gold opacity-70"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-          >
-            Your Curated Picks
-          </p>
-          <h2
-            className="text-balance text-3xl font-bold tracking-wide text-foreground sm:text-4xl"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-          >
-            Tonight's Screening List
-          </h2>
-        </header>
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border" />
+    <section className="mx-auto max-w-5xl px-4 py-12 animate-q-in sm:px-6">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <span
+          className="mb-3 inline-block text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+          style={{ fontFamily: "'Overpass Mono', monospace" }}
+        >
+          Your picks for tonight
+        </span>
+        <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
+          Here's what to <span className="text-gradient">watch</span> 🎬
+        </h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {results.map((t, i) => (
-          <ResultCard key={t.id} t={t} rank={i + 1} index={i} />
+      {/* Bento grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Hero card — spans full width */}
+        {hero && (
+          <div className="sm:col-span-2 animate-card-rise" style={{ animationDelay: "0s" }}>
+            <HeroCard t={hero} rank={1} />
+          </div>
+        )}
+        {/* Supporting cards */}
+        {rest.map((t, i) => (
+          <div key={t.id} className="animate-card-rise" style={{ animationDelay: `${(i + 1) * 0.08}s` }}>
+            <ResultCard t={t} rank={i + 2} />
+          </div>
         ))}
       </div>
 
-      <div className="mt-12 flex flex-col items-center gap-4">
+      {/* Footer */}
+      <div className="mt-10 flex flex-col items-center gap-3">
         <button
           onClick={onReset}
-          className="border border-border bg-card px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground transition-all duration-200 hover:border-gold/50 hover:text-gold"
-          style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+          className="rounded-xl border border-border bg-background px-6 py-3 text-sm font-bold text-foreground transition-all hover:border-primary/40 hover:bg-muted"
         >
-          ↺ New Screening
+          ↺ Start over
         </button>
-        <p className="text-xs text-muted-foreground/50">
-          Poster images sourced from{" "}
-          <a
-            href="https://www.wikipedia.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline transition-colors hover:text-gold/70"
-          >
+        <p className="text-xs text-muted-foreground/60">
+          Poster images from{" "}
+          <a href="https://www.wikipedia.org" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground">
             Wikipedia
           </a>{" "}
-          under{" "}
-          <a
-            href="https://creativecommons.org/licenses/by-sa/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline transition-colors hover:text-gold/70"
-          >
-            CC BY-SA 4.0
-          </a>
-          .
+          (CC BY-SA 4.0)
         </p>
       </div>
     </section>
   );
 }
 
-function ResultCard({ t, rank, index }: { t: Title; rank: number; index: number }) {
+/* Hero card — large horizontal layout */
+function HeroCard({ t, rank }: { t: Title; rank: number }) {
   const [imgError, setImgError] = useState(false);
   const posterUrl = t.posterPath && !imgError ? t.posterPath : null;
-  const watchUrl = t.imdb
-    ? `https://www.imdb.com/title/${t.imdb}/`
-    : t.tmdbId
-      ? `https://www.themoviedb.org/movie/${t.tmdbId}`
-      : "#";
+  const watchUrl = t.imdb ? `https://www.imdb.com/title/${t.imdb}/` : t.tmdbId ? `https://www.themoviedb.org/movie/${t.tmdbId}` : "#";
 
   return (
-    <article
-      className="card-glow group flex overflow-hidden border border-border bg-card animate-card-rise"
-      style={{ animationDelay: `${index * 0.09}s` }}
-    >
+    <article className="card-lift flex overflow-hidden rounded-2xl border border-border bg-card">
       {/* Poster */}
-      <div className="w-28 shrink-0 sm:w-36">
-        {posterUrl ? (
-          <img
-            src={posterUrl}
-            alt={`${t.title} poster`}
-            className="h-full w-full object-cover"
-            onError={() => setImgError(true)}
-            loading="lazy"
-          />
-        ) : (
-          <PosterFallback title={t.title} color={t.color} />
-        )}
+      <div className="w-36 shrink-0 sm:w-52">
+        {posterUrl
+          ? <img src={posterUrl} alt={`${t.title} poster`} className="h-full w-full object-cover" onError={() => setImgError(true)} loading="lazy" />
+          : <PosterFallback title={t.title} color={t.color} />
+        }
       </div>
-
       {/* Content */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        {/* Rank + rating row */}
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-crimson"
-              style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-            >
-              #{rank} {t.format === "movie" ? "Film" : "Series"}
-            </p>
-            <h3
-              className="mt-0.5 text-base font-bold leading-snug tracking-wide text-foreground sm:text-lg"
-              style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-            >
-              {t.title}{" "}
+      <div className="flex flex-1 flex-col justify-between p-5 sm:p-7">
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <div>
               <span
-                className="text-sm font-normal text-muted-foreground"
-                style={{ fontFamily: "'Crimson Text', Georgia, serif" }}
+                className="text-[10px] font-bold uppercase tracking-widest"
+                style={{ fontFamily: "'Overpass Mono', monospace", color: "#c800df" }}
               >
-                ({t.year})
+                #{rank} Pick · {t.format === "movie" ? "Film" : "Series"}
               </span>
-            </h3>
+              <h3 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">
+                {t.title}{" "}
+                <span className="text-base font-normal text-muted-foreground">({t.year})</span>
+              </h3>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-bold tabular-nums">
+              ★ {t.rating.toFixed(1)}
+            </span>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1 border border-gold/30 bg-gold/10 px-2.5 py-1 text-xs font-bold tabular-nums text-gold">
-            ★ {t.rating.toFixed(1)}
-          </span>
+
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {t.genres.slice(0, 3).map((g) => (
+              <span key={g} className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {g}
+              </span>
+            ))}
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white"
+              style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
+            >
+              {PLATFORM_LABEL[t.platforms[0]] ?? "Available"}
+            </span>
+          </div>
+
+          <p className="mt-3 line-clamp-3 text-sm font-light text-muted-foreground">
+            <span className="font-semibold text-foreground">Why you'll love it: </span>
+            {t.why}
+          </p>
         </div>
 
-        {/* Tags */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {t.genres.slice(0, 3).map((g) => (
-            <span
-              key={g}
-              className="border border-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
-              style={{ fontFamily: "'Cinzel', Georgia, serif" }}
-            >
+        <a
+          href={watchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex w-fit items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #c800df, #e60076)" }}
+        >
+          Watch now →
+        </a>
+      </div>
+    </article>
+  );
+}
+
+/* Supporting card — compact vertical layout */
+function ResultCard({ t, rank }: { t: Title; rank: number }) {
+  const [imgError, setImgError] = useState(false);
+  const posterUrl = t.posterPath && !imgError ? t.posterPath : null;
+  const watchUrl = t.imdb ? `https://www.imdb.com/title/${t.imdb}/` : t.tmdbId ? `https://www.themoviedb.org/movie/${t.tmdbId}` : "#";
+
+  return (
+    <article className="card-lift flex overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="w-24 shrink-0 sm:w-28">
+        {posterUrl
+          ? <img src={posterUrl} alt={`${t.title} poster`} className="h-full w-full object-cover" onError={() => setImgError(true)} loading="lazy" />
+          : <PosterFallback title={t.title} color={t.color} />
+        }
+      </div>
+      <div className="flex flex-1 flex-col p-4">
+        <span
+          className="text-[10px] font-bold uppercase tracking-widest"
+          style={{ fontFamily: "'Overpass Mono', monospace", color: "#c800df" }}
+        >
+          #{rank}
+        </span>
+        <h3 className="mt-0.5 text-base font-black leading-snug tracking-tight">
+          {t.title}{" "}
+          <span className="text-sm font-normal text-muted-foreground">({t.year})</span>
+        </h3>
+
+        <div className="mt-2 flex flex-wrap gap-1">
+          {t.genres.slice(0, 2).map((g) => (
+            <span key={g} className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               {g}
             </span>
           ))}
-          <span className="border border-crimson/40 bg-crimson/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-accent-foreground/70"
-                style={{ fontFamily: "'Cinzel', Georgia, serif" }}>
-            {PLATFORM_LABEL[t.platforms[0]] ?? "Available"}
-          </span>
         </div>
 
-        {/* Why */}
-        <p className="mt-3 line-clamp-3 text-sm italic text-foreground/70">
-          <span className="not-italic text-muted-foreground">Why you'll love it: </span>
-          {t.why}
-        </p>
+        <p className="mt-2 line-clamp-2 text-xs font-light text-muted-foreground">{t.why}</p>
 
-        {/* CTA */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto flex items-center justify-between pt-3">
+          <span className="text-xs font-bold tabular-nums text-muted-foreground">★ {t.rating.toFixed(1)}</span>
           <a
             href={watchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-gold transition-all hover:gap-2.5"
-            style={{ fontFamily: "'Cinzel', Georgia, serif" }}
+            className="text-xs font-bold transition-opacity hover:opacity-70"
+            style={{ color: "#c800df" }}
           >
-            Watch Now →
+            Watch →
           </a>
         </div>
       </div>
