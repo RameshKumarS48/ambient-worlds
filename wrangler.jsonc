@@ -19,6 +19,6 @@
     ]
   },
   "migrations": [
-    { "tag": "v1", "new_classes": ["WorldRoom"] }
+    { "tag": "v1", "new_sqlite_classes": ["WorldRoom"] }
   ]
 }
