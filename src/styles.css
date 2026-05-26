@@ -56,15 +56,16 @@ html, body {
 /* ── Scene control pill ── */
 .scene-ctrl {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(0,0,0,0.42); backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
-  padding: 5px 10px; cursor: pointer;
-  font-family: "IBM Plex Mono", monospace; font-size: 8px;
+  background: rgba(0,0,0,0.62); backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.18); border-radius: 20px;
+  padding: 6px 12px; cursor: pointer;
+  font-family: "IBM Plex Mono", monospace; font-size: 9px;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(232,228,220,0.5); transition: all 0.2s;
+  color: rgba(232,228,220,0.85); transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
-.scene-ctrl:hover { color: rgba(232,228,220,0.85); border-color: rgba(255,255,255,0.18); }
-.scene-ctrl.active { color: rgba(232,228,220,0.9); background: rgba(255,255,255,0.1); }
+.scene-ctrl:hover { color: #e8e4dc; border-color: rgba(255,255,255,0.35); background: rgba(0,0,0,0.72); }
+.scene-ctrl.active { color: #e8e4dc; background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
 
 /* ── Hotspot tooltip ── */
 .hotspot-label {

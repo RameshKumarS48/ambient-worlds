@@ -22,56 +22,63 @@ export function MusicPlayer({
   return (
     <div
       style={{
-        background: "rgba(0,0,0,0.45)",
+        background: "rgba(0,0,0,0.62)",
         backdropFilter: "blur(16px)",
         borderRadius: "20px",
-        border: "1px solid rgba(255,255,255,0.08)",
+        border: playing
+          ? "1px solid rgba(255,255,255,0.22)"
+          : "1px solid rgba(255,255,255,0.18)",
         overflow: "hidden",
         transition: "all 0.3s ease",
-        minWidth: expanded ? "220px" : "auto",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
       }}
     >
-      {/* Collapsed bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px" }}>
-        {/* Play/pause */}
+      {/* Main row */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 10px" }}>
+        {/* Play/stop button */}
         <button
           onClick={onTogglePlay}
           style={{
-            width: "28px", height: "28px", borderRadius: "50%",
-            background: playing ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            color: "#e8e4dc", cursor: "pointer",
+            width: "30px", height: "30px", borderRadius: "50%",
+            background: playing ? "rgba(232,228,220,0.18)" : "rgba(255,255,255,0.08)",
+            border: playing ? "1px solid rgba(232,228,220,0.35)" : "1px solid rgba(255,255,255,0.18)",
+            color: playing ? "#e8e4dc" : "rgba(232,228,220,0.75)",
+            cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "10px", flexShrink: 0, transition: "all 0.2s",
+            fontSize: "11px", flexShrink: 0,
+            transition: "all 0.2s",
           }}
+          title={playing ? "Stop music" : "Play music"}
         >
-          {playing ? "⏸" : "▶"}
+          {playing ? "⏹" : "▶"}
         </button>
 
-        {/* Track label */}
+        {/* Label / status */}
         <div
           style={{
             fontFamily: "'IBM Plex Mono', monospace",
-            fontSize: "8px",
+            fontSize: "9px",
             letterSpacing: "0.1em",
-            color: playing ? "rgba(232,228,220,0.6)" : "rgba(232,228,220,0.3)",
+            color: playing ? "rgba(232,228,220,0.9)" : "rgba(232,228,220,0.65)",
             textTransform: "uppercase",
             whiteSpace: "nowrap",
             cursor: "pointer",
+            userSelect: "none",
           }}
           onClick={() => setExpanded(!expanded)}
         >
           {playing ? `♪ ${label}` : "music off"}
         </div>
 
-        {/* Expand toggle */}
+        {/* Expand chevron */}
         <button
           onClick={() => setExpanded(!expanded)}
           style={{
             background: "none", border: "none", cursor: "pointer",
-            color: "rgba(232,228,220,0.3)", fontSize: "8px",
-            padding: "0 2px", lineHeight: 1,
+            color: "rgba(232,228,220,0.5)", fontSize: "9px",
+            padding: "0 2px", lineHeight: 1, flexShrink: 0,
           }}
+          title="Mix controls"
         >
           {expanded ? "▲" : "▼"}
         </button>
@@ -79,10 +86,24 @@ export function MusicPlayer({
 
       {/* Expanded mixer */}
       {expanded && (
-        <div style={{ padding: "4px 12px 10px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{
+          padding: "4px 12px 10px",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+        }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <VolumeRow label="music" value={musicVolume} onChange={onMusicVolume} color="#7ab3d4" />
-            <VolumeRow label="sound" value={ambientVolume} onChange={onAmbientVolume} color="#d4943a" />
+            <VolumeRow
+              label="music"
+              value={musicVolume}
+              onChange={onMusicVolume}
+              color="#7ab3d4"
+              disabled={!playing}
+            />
+            <VolumeRow
+              label="sound"
+              value={ambientVolume}
+              onChange={onAmbientVolume}
+              color="#d4943a"
+            />
           </div>
         </div>
       )}
@@ -90,28 +111,36 @@ export function MusicPlayer({
   );
 }
 
-function VolumeRow({ label, value, onChange, color }: {
-  label: string; value: number; onChange: (v: number) => void; color: string;
+function VolumeRow({ label, value, onChange, color, disabled = false }: {
+  label: string; value: number; onChange: (v: number) => void; color: string; disabled?: boolean;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       <span style={{
-        fontFamily: "'IBM Plex Mono', monospace", fontSize: "7px",
+        fontFamily: "'IBM Plex Mono', monospace", fontSize: "8px",
         letterSpacing: "0.1em", textTransform: "uppercase",
-        color: "rgba(232,228,220,0.4)", width: "36px",
+        color: disabled ? "rgba(232,228,220,0.25)" : "rgba(232,228,220,0.55)",
+        width: "36px", flexShrink: 0,
       }}>{label}</span>
       <input
         type="range" min="0" max="1" step="0.05" value={value}
+        disabled={disabled}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        style={{ width: "80px", accentColor: color, cursor: "pointer" }}
+        style={{
+          width: "80px", accentColor: color, cursor: disabled ? "default" : "pointer",
+          opacity: disabled ? 0.35 : 1,
+        }}
       />
       <button
+        disabled={disabled}
         onClick={() => onChange(value > 0 ? 0 : 0.6)}
         style={{
-          background: "none", border: "none", cursor: "pointer",
-          color: value > 0 ? "rgba(232,228,220,0.5)" : "rgba(232,228,220,0.2)",
-          fontSize: "10px", padding: 0,
+          background: "none", border: "none",
+          cursor: disabled ? "default" : "pointer",
+          color: disabled ? "rgba(232,228,220,0.2)" : value > 0 ? "rgba(232,228,220,0.7)" : "rgba(232,228,220,0.3)",
+          fontSize: "11px", padding: 0, lineHeight: 1,
         }}
+        title={value > 0 ? "Mute" : "Unmute"}
       >
         {value > 0 ? "🔊" : "🔇"}
       </button>
