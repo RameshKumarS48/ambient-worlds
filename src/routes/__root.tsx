@@ -12,21 +12,18 @@ import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div style={{
+      display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center",
+      background: "#0a0a0c", color: "#e8e4dc",
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "5rem", fontWeight: 300, fontStyle: "italic", margin: 0 }}>404</h1>
+        <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,228,220,0.4)", marginTop: "0.5rem" }}>
+          no world here
         </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
+        <Link to="/" style={{ display: "inline-block", marginTop: "2rem", fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.6rem", letterSpacing: "0.1em", color: "rgba(232,228,220,0.5)", textTransform: "uppercase", textDecoration: "none" }}>
+          ← back to worlds
+        </Link>
       </div>
     </div>
   );
@@ -37,28 +34,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+    <div style={{
+      display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center",
+      background: "#0a0a0c", color: "#e8e4dc",
+    }}>
+      <div style={{ textAlign: "center", maxWidth: "400px" }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "1.5rem", fontWeight: 300, fontStyle: "italic" }}>
+          Something broke
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.6rem", color: "rgba(232,228,220,0.4)", letterSpacing: "0.05em" }}>
+          {error.message}
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.75rem", justifyContent: "center" }}>
           <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() => { router.invalidate(); reset(); }}
+            style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", color: "#e8e4dc", padding: "8px 16px", cursor: "pointer", borderRadius: "3px" }}
           >
             Try again
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
+          <a href="/" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "transparent", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(232,228,220,0.5)", padding: "8px 16px", borderRadius: "3px", textDecoration: "none" }}>
             Go home
           </a>
         </div>
@@ -72,18 +66,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Binge" },
-      { name: "description", content: "Tonight's Perfect Pick is a quiz-based app that recommends movies and TV shows." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Binge" },
-      { property: "og:description", content: "Tonight's Perfect Pick is a quiz-based app that recommends movies and TV shows." },
+      { title: "Ambient Worlds" },
+      { name: "description", content: "Drop into tiny living scenes. Interactive ambient worlds you can share." },
+      { name: "theme-color", content: "#0a0a0c" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Binge" },
-      { name: "twitter:description", content: "Tonight's Perfect Pick is a quiz-based app that recommends movies and TV shows." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c573b396-4550-4b57-8440-1caa762e300b/id-preview-16250095--b31f92a3-81e8-4126-9662-b884c940d808.lovable.app-1779390658825.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c573b396-4550-4b57-8440-1caa762e300b/id-preview-16250095--b31f92a3-81e8-4126-9662-b884c940d808.lovable.app-1779390658825.png" },
+      { property: "og:title", content: "Ambient Worlds" },
+      { property: "og:site_name", content: "Ambient Worlds" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

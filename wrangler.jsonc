@@ -1,13 +1,24 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "watch-tonight-quiz",
+  "name": "ambient-worlds",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
   "routes": [
     {
-      "pattern": "binge.rameshkumar.space/*",
+      "pattern": "scenes.rameshkumar.space/*",
       "zone_name": "rameshkumar.space"
     }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "WORLD_ROOM",
+        "class_name": "WorldRoom"
+      }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_classes": ["WorldRoom"] }
   ]
 }

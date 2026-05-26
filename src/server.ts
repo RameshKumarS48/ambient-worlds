@@ -2,6 +2,13 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { WorldRoom } from "./worker/durableObjects";
+
+export { WorldRoom };
+
+interface Env {
+  WORLD_ROOM: DurableObjectNamespace;
+}
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -50,8 +57,6 @@ function isCatastrophicSsrErrorBody(body: string, responseStatus: number): boole
   );
 }
 
-// h3 swallows in-handler throws into a normal 500 Response with body
-// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -67,7 +72,29 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request, env: Env, ctx: unknown) {
+    const url = new URL(request.url);
+
+    // Route WebSocket room requests to Durable Object
+    // Pattern: /api/room/:worldId/:roomId/ws
+    if (url.pathname.startsWith("/api/room/")) {
+      const parts = url.pathname.split("/").filter(Boolean);
+      // parts: ["api", "room", worldId, roomId, "ws"]
+      if (parts.length === 5 && parts[4] === "ws") {
+        const worldId = parts[2];
+        const roomId = parts[3];
+        const doName = roomId === "public" ? worldId : roomId;
+        const id = env.WORLD_ROOM.idFromName(doName);
+        const stub = env.WORLD_ROOM.get(id);
+
+        // Forward to DO with worldId as query param
+        const doUrl = new URL(request.url);
+        doUrl.pathname = "/ws";
+        doUrl.searchParams.set("worldId", worldId);
+        return stub.fetch(new Request(doUrl.toString(), request));
+      }
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
