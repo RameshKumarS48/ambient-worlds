@@ -18,7 +18,7 @@ export function NightTrainScene({ state, onInteract }: SceneProps) {
   return (
     <div
       className="world-scene animate-world-in"
-      style={{ background: "linear-gradient(180deg, #0e0e14 0%, #111118 100%)" }}
+      style={{ backgroundImage: "url('/worlds/night-train.png')" }}
     >
       {/* Carriage ceiling */}
       <div style={{

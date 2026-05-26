@@ -1,26 +1,48 @@
 import type { ComponentType } from "react";
-import { RainyBedroomScene } from "./rainy-bedroom/Scene";
+import { RainyTokyoScene } from "./rainy-tokyo/Scene";
 import { NightTrainScene } from "./night-train/Scene";
-import { CozyCafeScene } from "./cozy-cafe/Scene";
-import { rainyBedroomAudio } from "./rainy-bedroom/audio";
+import { QuietLibraryScene } from "./quiet-library/Scene";
+import { CyberpunkRoomScene } from "./cyberpunk-room/Scene";
+import { CampfireScene } from "./campfire/Scene";
+import { SpaceshipScene } from "./spaceship/Scene";
+import { rainyTokyoAudio } from "./rainy-tokyo/audio";
 import { nightTrainAudio } from "./night-train/audio";
-import { cozyCafeAudio } from "./cozy-cafe/audio";
-import { rainyBedroomInteractions } from "./rainy-bedroom/interactions";
+import { quietLibraryAudio } from "./quiet-library/audio";
+import { cyberpunkRoomAudio } from "./cyberpunk-room/audio";
+import { campfireAudio } from "./campfire/audio";
+import { spaceshipAudio } from "./spaceship/audio";
+import { rainyTokyoInteractions } from "./rainy-tokyo/interactions";
 import { nightTrainInteractions } from "./night-train/interactions";
-import { cozyCafeInteractions } from "./cozy-cafe/interactions";
+import { quietLibraryInteractions } from "./quiet-library/interactions";
+import { cyberpunkRoomInteractions } from "./cyberpunk-room/interactions";
+import { campfireInteractions } from "./campfire/interactions";
+import { spaceshipInteractions } from "./spaceship/interactions";
 
-export type WorldId = "rainy-bedroom" | "night-train" | "cozy-cafe";
+export type WorldId =
+  | "rainy-tokyo"
+  | "night-train"
+  | "quiet-library"
+  | "cyberpunk-room"
+  | "campfire"
+  | "spaceship";
 
 export interface WorldState {
+  // rainy-tokyo
   lampDim?: boolean;
   rainIntensity?: number;
   windowOpen?: boolean;
+  // night-train
   lightsFlicker?: boolean;
   trainSpeed?: number;
   frostedGlass?: boolean;
-  teaReady?: boolean;
+  // quiet-library
+  clockTicking?: boolean;
+  // cyberpunk-room
+  holoActive?: boolean;
+  neonOn?: boolean;
+  // campfire
+  fireIntensity?: number;
   fanOn?: boolean;
-  radioStatic?: number;
 }
 
 export type WorldAction =
@@ -30,9 +52,7 @@ export type WorldAction =
   | { type: "TOGGLE_LIGHTS_FLICKER" }
   | { type: "SET_TRAIN_SPEED"; speed: number }
   | { type: "TOGGLE_FROSTED_GLASS" }
-  | { type: "MAKE_TEA" }
-  | { type: "TOGGLE_FAN" }
-  | { type: "SET_RADIO_STATIC"; level: number };
+  | { type: "TOGGLE_FAN" };
 
 export interface SceneProps {
   state: WorldState;
@@ -58,21 +78,21 @@ export interface WorldMeta {
 }
 
 export const WORLDS: Record<WorldId, WorldMeta> = {
-  "rainy-bedroom": {
-    id: "rainy-bedroom",
-    title: "Rainy Bedroom",
-    subtitle: "Tokyo, 3am",
+  "rainy-tokyo": {
+    id: "rainy-tokyo",
+    title: "Rainy Tokyo",
+    subtitle: "3am, tatami room",
     bg: "#0d1117",
     accent: "#d4823a",
-    Scene: RainyBedroomScene,
-    getAudio: rainyBedroomAudio,
-    initialState: rainyBedroomInteractions.initialState,
-    applyAction: rainyBedroomInteractions.applyAction,
+    Scene: RainyTokyoScene,
+    getAudio: rainyTokyoAudio,
+    initialState: rainyTokyoInteractions.initialState,
+    applyAction: rainyTokyoInteractions.applyAction,
   },
   "night-train": {
     id: "night-train",
     title: "Night Train",
-    subtitle: "Somewhere in the snow",
+    subtitle: "somewhere in the snow",
     bg: "#0e0e14",
     accent: "#7ab3d4",
     Scene: NightTrainScene,
@@ -80,16 +100,49 @@ export const WORLDS: Record<WorldId, WorldMeta> = {
     initialState: nightTrainInteractions.initialState,
     applyAction: nightTrainInteractions.applyAction,
   },
-  "cozy-cafe": {
-    id: "cozy-cafe",
-    title: "Cozy Café",
-    subtitle: "Mumbai, monsoon season",
-    bg: "#150e06",
-    accent: "#d4943a",
-    Scene: CozyCafeScene,
-    getAudio: cozyCafeAudio,
-    initialState: cozyCafeInteractions.initialState,
-    applyAction: cozyCafeInteractions.applyAction,
+  "quiet-library": {
+    id: "quiet-library",
+    title: "Quiet Library",
+    subtitle: "late afternoon, gothic reading room",
+    bg: "#0f0b07",
+    accent: "#c8a96a",
+    Scene: QuietLibraryScene,
+    getAudio: quietLibraryAudio,
+    initialState: quietLibraryInteractions.initialState,
+    applyAction: quietLibraryInteractions.applyAction,
+  },
+  "cyberpunk-room": {
+    id: "cyberpunk-room",
+    title: "Cyberpunk Room",
+    subtitle: "neon-drenched desk, rain outside",
+    bg: "#060810",
+    accent: "#00c8ff",
+    Scene: CyberpunkRoomScene,
+    getAudio: cyberpunkRoomAudio,
+    initialState: cyberpunkRoomInteractions.initialState,
+    applyAction: cyberpunkRoomInteractions.applyAction,
+  },
+  "campfire": {
+    id: "campfire",
+    title: "Campfire",
+    subtitle: "deep forest, midnight",
+    bg: "#0a0500",
+    accent: "#e8823a",
+    Scene: CampfireScene,
+    getAudio: campfireAudio,
+    initialState: campfireInteractions.initialState,
+    applyAction: campfireInteractions.applyAction,
+  },
+  "spaceship": {
+    id: "spaceship",
+    title: "Spaceship",
+    subtitle: "deep space, quiet drift",
+    bg: "#030509",
+    accent: "#00c8b4",
+    Scene: SpaceshipScene,
+    getAudio: spaceshipAudio,
+    initialState: spaceshipInteractions.initialState,
+    applyAction: spaceshipInteractions.applyAction,
   },
 };
 

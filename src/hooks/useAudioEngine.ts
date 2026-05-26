@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import type { WorldId, WorldAudioEngine } from "@/worlds/registry";
 import { WORLDS } from "@/worlds/registry";
 
-export function useAudioEngine(worldId: WorldId, unlocked: boolean) {
+export function useAudioEngine(worldId: WorldId, unlocked: boolean, ambientVolume = 0.8) {
   const engineRef = useRef<WorldAudioEngine | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const currentWorldRef = useRef<WorldId | null>(null);
@@ -24,12 +24,16 @@ export function useAudioEngine(worldId: WorldId, unlocked: boolean) {
       const world = WORLDS[worldId];
       engineRef.current = world.getAudio();
       engineRef.current.start(ctxRef.current);
+      engineRef.current.setParam("ambientVolume", ambientVolume);
     }
-
-    return () => {
-      // Cleanup on worldId change or unmount
-    };
   }, [worldId, unlocked]);
+
+  // Keep ambient volume in sync without re-creating engine
+  useEffect(() => {
+    if (engineRef.current && ctxRef.current) {
+      engineRef.current.setParam("ambientVolume", ambientVolume);
+    }
+  }, [ambientVolume]);
 
   // Full teardown on unmount
   useEffect(() => {

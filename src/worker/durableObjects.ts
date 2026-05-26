@@ -1,18 +1,27 @@
-import { rainyBedroomInteractions } from "@/worlds/rainy-bedroom/interactions";
+import { rainyTokyoInteractions } from "@/worlds/rainy-tokyo/interactions";
 import { nightTrainInteractions } from "@/worlds/night-train/interactions";
-import { cozyCafeInteractions } from "@/worlds/cozy-cafe/interactions";
+import { quietLibraryInteractions } from "@/worlds/quiet-library/interactions";
+import { cyberpunkRoomInteractions } from "@/worlds/cyberpunk-room/interactions";
+import { campfireInteractions } from "@/worlds/campfire/interactions";
+import { spaceshipInteractions } from "@/worlds/spaceship/interactions";
 import type { WorldState, WorldAction, WorldId } from "@/worlds/registry";
 
 const REDUCERS: Record<string, (s: WorldState, a: WorldAction) => WorldState> = {
-  "rainy-bedroom": rainyBedroomInteractions.applyAction,
+  "rainy-tokyo": rainyTokyoInteractions.applyAction,
   "night-train": nightTrainInteractions.applyAction,
-  "cozy-cafe": cozyCafeInteractions.applyAction,
+  "quiet-library": quietLibraryInteractions.applyAction,
+  "cyberpunk-room": cyberpunkRoomInteractions.applyAction,
+  "campfire": campfireInteractions.applyAction,
+  "spaceship": spaceshipInteractions.applyAction,
 };
 
 const INITIAL_STATES: Record<string, WorldState> = {
-  "rainy-bedroom": rainyBedroomInteractions.initialState,
+  "rainy-tokyo": rainyTokyoInteractions.initialState,
   "night-train": nightTrainInteractions.initialState,
-  "cozy-cafe": cozyCafeInteractions.initialState,
+  "quiet-library": quietLibraryInteractions.initialState,
+  "cyberpunk-room": cyberpunkRoomInteractions.initialState,
+  "campfire": campfireInteractions.initialState,
+  "spaceship": spaceshipInteractions.initialState,
 };
 
 const AVATAR_COLORS = ["#E8B89A", "#A8C5B5", "#C4A8D4", "#F0D080", "#9BB8D4", "#D4A8B8"];

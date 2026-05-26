@@ -2,12 +2,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { WORLDS, WORLD_IDS, type WorldId } from "@/worlds/registry";
 
-const PREVIEW_STATE = {
-  "rainy-bedroom": { lampDim: false, rainIntensity: 0.8, windowOpen: false },
-  "night-train": { lightsFlicker: false, trainSpeed: 0.7, frostedGlass: false },
-  "cozy-cafe": { teaReady: true, fanOn: true, radioStatic: 0.3 },
-};
-
 export function LandingPortal() {
   const navigate = useNavigate();
 
@@ -36,11 +30,11 @@ export function LandingPortal() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        style={{ textAlign: "center", marginBottom: "3rem" }}
+        style={{ textAlign: "center", marginBottom: "2.5rem" }}
       >
         <h1 style={{
           fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+          fontSize: "clamp(2.2rem, 5vw, 4rem)",
           fontWeight: 300,
           fontStyle: "italic",
           color: "#e8e4dc",
@@ -64,62 +58,56 @@ export function LandingPortal() {
 
       {/* World cards */}
       <div style={{
-        display: "flex",
-        gap: "1rem",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        maxWidth: "900px",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        gap: "0.875rem",
         width: "100%",
+        maxWidth: "1100px",
+        padding: "0 0.5rem",
       }}>
         {WORLD_IDS.map((id, i) => {
           const world = WORLDS[id];
-          const previewState = PREVIEW_STATE[id];
 
           return (
             <motion.div
               key={id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + i * 0.12, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              transition={{ delay: 0.15 + i * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -6, transition: { duration: 0.18 } }}
               onClick={() => enterWorld(id)}
               style={{
                 cursor: "pointer",
-                borderRadius: "8px",
+                borderRadius: "6px",
                 overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.06)",
                 background: world.bg,
-                width: "240px",
-                flex: "0 0 240px",
                 position: "relative",
               }}
             >
-              {/* Scene preview - scaled down */}
+              {/* Image preview */}
               <div style={{
-                width: "240px",
-                height: "160px",
-                overflow: "hidden",
+                width: "100%",
+                height: "130px",
+                backgroundImage: `url('/worlds/${id}.png')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 position: "relative",
               }}>
                 <div style={{
-                  width: `${240 / 0.25}px`,
-                  height: `${160 / 0.25}px`,
-                  transform: "scale(0.25)",
-                  transformOrigin: "top left",
-                  pointerEvents: "none",
-                }}>
-                  <world.Scene state={previewState} onInteract={() => {}} />
-                </div>
+                  position: "absolute", inset: 0,
+                  background: "linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%)",
+                }} />
               </div>
 
               {/* Card info */}
               <div style={{
-                padding: "12px 14px",
-                background: `linear-gradient(180deg, ${world.bg}aa 0%, ${world.bg} 100%)`,
+                padding: "10px 12px 12px",
+                background: `linear-gradient(180deg, ${world.bg}ee 0%, ${world.bg} 100%)`,
               }}>
                 <div style={{
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontSize: "1.1rem",
+                  fontSize: "1.05rem",
                   fontStyle: "italic",
                   color: world.accent,
                   fontWeight: 400,
@@ -128,11 +116,12 @@ export function LandingPortal() {
                 </div>
                 <div style={{
                   fontFamily: "'IBM Plex Mono', monospace",
-                  fontSize: "0.55rem",
-                  letterSpacing: "0.12em",
-                  color: "rgba(232,228,220,0.35)",
+                  fontSize: "0.52rem",
+                  letterSpacing: "0.1em",
+                  color: "rgba(232,228,220,0.3)",
                   textTransform: "uppercase",
                   marginTop: "3px",
+                  lineHeight: 1.4,
                 }}>
                   {world.subtitle}
                 </div>
@@ -144,7 +133,7 @@ export function LandingPortal() {
                 whileHover={{ opacity: 1 }}
                 style={{
                   position: "absolute", inset: 0,
-                  background: "rgba(255,255,255,0.04)",
+                  background: "rgba(255,255,255,0.03)",
                   pointerEvents: "none",
                 }}
               />
@@ -162,26 +151,26 @@ export function LandingPortal() {
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
         style={{
-          marginTop: "2.5rem",
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "rgba(232,228,220,0.7)",
+          marginTop: "2rem",
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          color: "rgba(232,228,220,0.65)",
           fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: "0.65rem",
-          letterSpacing: "0.16em",
+          fontSize: "0.62rem",
+          letterSpacing: "0.15em",
           textTransform: "uppercase",
-          padding: "10px 24px",
+          padding: "9px 22px",
           cursor: "pointer",
           borderRadius: "4px",
-          transition: "border-color 0.2s",
+          transition: "border-color 0.2s, color 0.2s",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+          e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
           e.currentTarget.style.color = "rgba(232,228,220,0.9)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
-          e.currentTarget.style.color = "rgba(232,228,220,0.7)";
+          e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+          e.currentTarget.style.color = "rgba(232,228,220,0.65)";
         }}
       >
         enter a random world →
